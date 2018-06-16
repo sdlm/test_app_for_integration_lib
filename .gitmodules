@@ -1,0 +1,3 @@
+[submodule "lib/integration"]
+	path = lib/integration
+	url = https://github.com/sdlm/integration_with_external_service.git
