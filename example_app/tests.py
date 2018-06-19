@@ -4,10 +4,15 @@ import feedparser
 from django.conf import settings
 from django.test import TestCase
 
+import lib.grabber.grabber as grabber
+
 
 class RSSTestCase(TestCase):
 
-    def test_get_feeds(self):
+    def test_RSSEntriesGrabber(self):
+        
+        grabber = grabber.RSSEntriesGrabber()
+        
         print('=' * 50)
         print('=' * 50)
         print('HABRAHABR_RSS:')
