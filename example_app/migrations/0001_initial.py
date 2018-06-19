@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 ('text', models.TextField()),
                 ('url', models.CharField(max_length=512)),
                 ('created', models.DateField()),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                             related_name='posts', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
