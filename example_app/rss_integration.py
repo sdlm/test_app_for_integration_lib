@@ -42,4 +42,3 @@ class EntrySchema(Schema):
         instance = Post.objects.get_or_create(**data)[0]
         instance.tags.set(tags)
         return instance
-

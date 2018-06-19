@@ -7,8 +7,8 @@ from faker import Faker
 from grabber import RSSEntriesGrabber
 
 from example_app.constants import ENTRIES_FILE_PATH
+from example_app.fork_serializers import DjangoUserSchema, DjangoEntrySchema
 from example_app.models import Post, Tag
-from example_app.rss_integration import EntrySchema
 
 REDDIT_RSS_ENDPOINT = 'https://www.reddit.com/r/news/.rss'
 HABRAHABR_RSS_ENDPOINT = 'https://habrahabr.ru/rss/hubs/all/'
@@ -22,6 +22,13 @@ class GrabberTests(TestCase):
 
 
 class SchemaTests(TestCase):
+
+    def test_basic(self):
+        fake = Faker()
+        schema = DjangoUserSchema()
+        name = fake.user_name()
+        schema.load({'name': name})
+        self.assertTrue(User.objects.filter(username=name).exists())
 
     def test_schema(self):
         entries = get_entries()
@@ -99,7 +106,7 @@ class DuplicatesTests(TestCase):
 
 
 def load_entries(entries):
-    schema = EntrySchema()
+    schema = DjangoEntrySchema()
     for entry in entries:
         schema.load(entry)
 
