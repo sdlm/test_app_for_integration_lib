@@ -1,0 +1,3 @@
+[submodule "grabber"]
+	path = grabber
+	url = https://github.com/sdlm/simplest_grabber.git
