@@ -1,6 +1,0 @@
-[submodule "lib/grabber"]
-	path = lib/grabber
-	url = https://github.com/sdlm/simplest_grabber.git
-[submodule "lib/serializer"]
-	path = lib/serializer
-	url = https://github.com/sdlm/simplest_serializer.git
