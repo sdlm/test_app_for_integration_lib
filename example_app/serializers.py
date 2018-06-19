@@ -1,13 +1,16 @@
 from django.contrib.auth.models import User
+from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from example_app.models import Tag, Post
 
 
 class UserSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='username')
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', )
+        fields = ('name', )
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -18,9 +21,9 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('term', )
 
 
-class PostSerializer(serializers.ModelSerializer):
-    author = serializers.CharField()
-    tags = TagSerializer(many=True)
+class PostSerializer(WritableNestedModelSerializer):
+    author = UserSerializer()
+    tags = TagSerializer(many=True, required=False)
     title = serializers.CharField()
     summary = serializers.CharField(source='text')
     link = serializers.URLField(source='url')
@@ -29,20 +32,9 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('author', 'tags', 'title', 'summary', 'link', )
 
-    def create_tags(self, tags_data):
-        return [Tag.objects.get_or_create(**tag_data)[0] for tag_data in tags_data]
-
-    def get_or_create_author(self, username):
-        return User.objects.get_or_create(username=username)[0]
-
-    def create(self, validated_data) -> Post:
-        tags = self.create_tags(validated_data['tags'])
-        del validated_data['tags']
-
-        validated_data['author'] = self.get_or_create_author(username=validated_data['author'])
-
-        instance = Post.objects.create(**validated_data)
-
-        instance.tags.set(tags)
-
-        return instance
+    def create(self, validated_data):
+        username = validated_data['author']['username']
+        user = User.objects.filter(username=username).first()
+        if user:
+            self.initial_data['author']['pk'] = user.pk
+        return super().create(validated_data)

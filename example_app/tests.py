@@ -25,7 +25,9 @@ class RSSTests(TestCase):
     def test_DRFSerializer(self):
         self.assertFalse(Post.objects.exists())
         entries = self.get_entries()
-        serializer = PostSerializer(data=entries, many=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        for entry in entries:
+            entry['author'] = {'name': entry['author']}
+            serializer = PostSerializer(data=entry)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         self.assertTrue(Post.objects.exists())
