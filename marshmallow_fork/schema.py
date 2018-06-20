@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from marshmallow import Schema, SchemaOpts, post_load
 
 
@@ -21,16 +23,17 @@ class DjangoModelSchema(Schema):
     def make_object(self, data):
         model = self.opts.model
 
+        # noinspection PyProtectedMember
         fields = model._meta.get_fields()
 
         m2m_fields = self.get_m2m_fields(fields)
         # fk_fields = self.get_fk_fields(fields)
 
-        m2m_data = self.get_cut_data_for_fields(data, m2m_fields)
+        data, m2m_data = self.separate_data_for_m2m_fields(data, m2m_fields)
 
-        instance, _ = self.opts.model.objects.get_or_create(**data)
+        instance, _ = model.objects.get_or_create(**data)
 
-        self.update_m2m_relations(m2m_data, instance)
+        self.update_m2m_relations(instance, m2m_data)
 
         return instance
 
@@ -49,15 +52,15 @@ class DjangoModelSchema(Schema):
         ]
 
     @staticmethod
-    def get_cut_data_for_fields(data: dict, fields: list) -> dict:
-        result = {}
+    def separate_data_for_m2m_fields(data: dict, fields: list) -> Tuple[dict, dict]:
+        data_for_m2m_fields = {}
         for f in fields:
             if f.name in data:
-                result[f.name] = data.pop(f.name)
-        return result
+                data_for_m2m_fields[f.name] = data.pop(f.name)
+        return data, data_for_m2m_fields
 
     @staticmethod
-    def update_m2m_relations(m2m_data: dict, instance) -> None:
+    def update_m2m_relations(instance, m2m_data: dict) -> None:
         for field_name, objects in m2m_data.items():
             getattr(instance, field_name).set(objects)
 
