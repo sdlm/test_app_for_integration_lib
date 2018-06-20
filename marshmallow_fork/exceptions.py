@@ -1,0 +1,2 @@
+class InconsistentDataError(Exception):
+    pass

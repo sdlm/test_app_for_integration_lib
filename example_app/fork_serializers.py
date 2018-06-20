@@ -23,6 +23,7 @@ class DjangoEntrySchema(DjangoModelSchema):
     title = fields.String()
     summary = fields.String(attribute='text')
     link = fields.Url(attribute='url')
+    hash = fields.String(attribute='hash')
 
     author = fields.Nested(DjangoUserSchema)
     tags = fields.Nested(DjangoTagSchema, many=True)

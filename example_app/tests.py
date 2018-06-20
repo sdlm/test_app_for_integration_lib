@@ -61,6 +61,28 @@ class SchemaTests(TestCase):
         post.refresh_from_db()
         self.compare_post_and_entry(post, entry)
 
+    def test_new_first_uniq_field_and_duplicate_second_uniq_field(self):
+        url_1 = get_fake_url()
+        url_2 = get_fake_url()
+        hash_value = get_fake_hash()
+        post = create_fake_post(url=url_1, hash_val=hash_value)
+        expected_post_data = post.__dict__.copy()
+
+        entry = get_fake_entry(link=url_2, tags_count=2)
+        entry['hash'] = hash_value
+
+        load_entries([entry])
+
+        # don't update existed instance
+        post.refresh_from_db()
+        actual_post_data = post.__dict__.copy()
+        self.assertEqual(actual_post_data, expected_post_data)
+
+        # and don't create new one
+        self.assertFalse(Post.objects.filter(url=url_2).exists())
+        self.assertFalse(Post.objects.filter(title=entry['title']).exists())
+        self.assertFalse(Post.objects.filter(text=entry['summary']).exists())
+
     def compare_post_and_entry(self, post, entry):
         self.assertEqual(post.title, entry['title'])
         self.assertEqual(post.text, entry['summary'])
@@ -143,13 +165,19 @@ def get_fake_url() -> str:
     return fake.url()
 
 
-def create_fake_post(url: str = None) -> Post:
+def get_fake_hash() -> str:
+    fake = Faker()
+    return fake.md5()
+
+
+def create_fake_post(url: str = None, hash_val: str = None) -> Post:
     fake = Faker()
     post = Post.objects.create(
         title=fake.sentence(),
         text=fake.text(),
         author=User.objects.create(username=fake.user_name()),
         url=url or fake.url(),
+        hash=hash_val
     )
     post.tags.set([Tag.objects.create(name=fake.word())])
     return post

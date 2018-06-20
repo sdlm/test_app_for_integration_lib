@@ -1,6 +1,7 @@
-from typing import Tuple
-
 from marshmallow import Schema, SchemaOpts, post_load
+
+from marshmallow_fork.classes import DjangoModelHelper
+from marshmallow_fork.exceptions import InconsistentDataError
 
 
 class ORMModelOpts(SchemaOpts):
@@ -21,48 +22,27 @@ class DjangoModelSchema(Schema):
 
     @post_load
     def make_object(self, data):
+
+        model, fields = self.get_model_and_fields()
+
+        helper = DjangoModelHelper(model=model, fields=fields, data=data)
+
+        try:
+            instance = helper.update_instance_if_exists_by_search_by_uniq_fields()
+        except InconsistentDataError:
+            return None
+        if instance:
+            return instance
+
+        return helper.get_or_create_with_care_about_m2m()
+
+    def get_model_and_fields(self):
         model = self.opts.model
 
         # noinspection PyProtectedMember
         fields = model._meta.get_fields()
 
-        m2m_fields = self.get_m2m_fields(fields)
-        # fk_fields = self.get_fk_fields(fields)
-
-        data, m2m_data = self.separate_data_for_m2m_fields(data, m2m_fields)
-
-        instance, _ = model.objects.get_or_create(**data)
-
-        self.update_m2m_relations(instance, m2m_data)
-
-        return instance
-
-    @staticmethod
-    def get_m2m_fields(fields: list) -> list:
-        return [
-            f for f in fields
-            if f.many_to_many and not f.auto_created
-        ]
-
-    @staticmethod
-    def get_fk_fields(fields: list) -> list:
-        return [
-            f for f in fields
-            if (f.one_to_many or f.one_to_one) and not f.auto_created
-        ]
-
-    @staticmethod
-    def separate_data_for_m2m_fields(data: dict, fields: list) -> Tuple[dict, dict]:
-        data_for_m2m_fields = {}
-        for f in fields:
-            if f.name in data:
-                data_for_m2m_fields[f.name] = data.pop(f.name)
-        return data, data_for_m2m_fields
-
-    @staticmethod
-    def update_m2m_relations(instance, m2m_data: dict) -> None:
-        for field_name, objects in m2m_data.items():
-            getattr(instance, field_name).set(objects)
+        return model, fields
 
 
 class SQLAlchemyModelSchema(Schema):
