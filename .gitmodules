@@ -1,3 +1,6 @@
-[submodule "lib/integration"]
-	path = lib/integration
-	url = https://github.com/sdlm/integration_with_external_service.git
+[submodule "grabber"]
+	path = grabber
+	url = https://github.com/sdlm/simplest_grabber.git
+[submodule "marshmallow_orm_drivers"]
+	path = marshmallow_orm_drivers
+	url = https://github.com/sdlm/marshmallow_orm_drivers.git

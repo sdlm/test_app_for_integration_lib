@@ -1,16 +1,32 @@
-from marshmallow import Schema, fields
+from django.contrib.auth.models import User
+from marshmallow import fields
+
+from example_app.models import Tag, Post
+from marshmallow_orm_drivers.marshmallow_orm_drivers import DjangoModelSchema
 
 
-class UserSchema(Schema):
-    name = fields.Str()
-    email = fields.Email()
+class DjangoUserSchema(DjangoModelSchema):
+    name = fields.String(attribute='username')
+
+    class Meta:
+        model = User
 
 
-class TagSchema(Schema):
-    name = fields.String()
+class DjangoTagSchema(DjangoModelSchema):
+    term = fields.String(attribute='name')
+
+    class Meta:
+        model = Tag
 
 
-class PostSchema(Schema):
+class DjangoEntrySchema(DjangoModelSchema):
     title = fields.String()
-    text = fields.String()
-    author = fields.Integer()
+    summary = fields.String(attribute='text')
+    link = fields.Url(attribute='url')
+    hash = fields.String(attribute='hash')
+
+    author = fields.Nested(DjangoUserSchema)
+    tags = fields.Nested(DjangoTagSchema, many=True)
+
+    class Meta:
+        model = Post

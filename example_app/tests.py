@@ -7,8 +7,8 @@ from faker import Faker
 from grabber import RSSEntriesGrabber
 
 from example_app.constants import ENTRIES_FILE_PATH
-from example_app.fork_serializers import DjangoUserSchema, DjangoEntrySchema
 from example_app.models import Post, Tag
+from example_app.serializers import DjangoUserSchema, DjangoEntrySchema
 
 REDDIT_RSS_ENDPOINT = 'https://www.reddit.com/r/news/.rss'
 HABRAHABR_RSS_ENDPOINT = 'https://habrahabr.ru/rss/hubs/all/'
