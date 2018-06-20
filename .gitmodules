@@ -1,6 +1,6 @@
-[submodule "lib/grabber"]
-	path = lib/grabber
+[submodule "grabber"]
+	path = grabber
 	url = https://github.com/sdlm/simplest_grabber.git
-[submodule "lib/serializer"]
-	path = lib/serializer
-	url = https://github.com/sdlm/simplest_serializer.git
+[submodule "marshmallow_orm_drivers"]
+	path = marshmallow_orm_drivers
+	url = https://github.com/sdlm/marshmallow_orm_drivers.git
