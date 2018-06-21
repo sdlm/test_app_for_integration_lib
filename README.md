@@ -30,7 +30,7 @@ marshmallow_orm_drivers==0.1
 * пакеты из первой части устанавливаются как pip пакеты
 
 ### Схема БД
-[marshmallow_orm_drivers_test_schema](https://rawgit.com/sdlm/test_app_for_integration_lib/master/static_files/marshmallow_orm_drivers_test_schema.png)
+![marshmallow_orm_drivers_test_schema](https://rawgit.com/sdlm/test_app_for_integration_lib/master/static_files/marshmallow_orm_drivers_test_schema.png)
 
 ### P.S.
 Так же можно посмотреть пробные реализации в других ветках этого репозитория.
